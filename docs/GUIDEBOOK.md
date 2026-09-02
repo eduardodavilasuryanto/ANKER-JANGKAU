@@ -3,9 +3,6 @@
 > This book is the single instruction manual for everyone who builds, tests,
 > or ships code inside the ANKER-JANGKAU repository. Read it before you write
 > your first line. Come back when you are not sure where a file belongs.
->
-> Writing rule: plain American English, no em dashes, kid-friendly analogies
-> where they help, precise tables and numbered laws where they do not.
 
 ---
 
