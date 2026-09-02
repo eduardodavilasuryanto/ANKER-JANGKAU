@@ -1,0 +1,17 @@
+# Pipeline dependencies (Saturday meal prep).
+# Install in a separate venv or share with backend/.venv.
+#
+#   python -m venv .venv
+#   .venv\Scripts\pip install -r requirements.txt
+
+geopandas>=1.0.0
+shapely>=2.0.0
+pyproj>=3.6.0
+fiona>=1.10.0
+statsmodels>=0.14.0
+scipy>=1.14.0
+pandas>=2.2.0
+numpy>=2.0.0
+requests>=2.32.0
+python-dotenv>=1.0.1
+pytest>=8.3.0

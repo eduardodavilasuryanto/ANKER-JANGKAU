@@ -1,0 +1,160 @@
+:root {
+  --navy: #002d62;
+  --paper: #f8fafc;
+  --ink: #0f172a;
+  --line: #cbd5e1;
+  --high: #15803d;
+  --mid: #ca8a04;
+  --low: #b91c1c;
+  --panel-width: 320px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  height: 100%;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+#app {
+  display: grid;
+  grid-template-columns: var(--panel-width) 1fr auto;
+  grid-template-rows: 56px 1fr;
+  grid-template-areas:
+    "topbar topbar topbar"
+    "recommend map layers";
+}
+
+.topbar {
+  grid-area: topbar;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: var(--navy);
+  color: #fff;
+}
+
+.brand span {
+  margin-left: 8px;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+.tag {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.panel,
+.layers,
+.legend {
+  background: #fff;
+  border-right: 1px solid var(--line);
+  padding: 16px;
+  overflow: auto;
+}
+
+.panel {
+  grid-area: recommend;
+}
+
+.layers {
+  grid-area: layers;
+  width: 240px;
+  border-right: 0;
+  border-left: 1px solid var(--line);
+}
+
+.map {
+  grid-area: map;
+  min-height: 0;
+}
+
+.legend {
+  position: absolute;
+  right: 256px;
+  bottom: 16px;
+  width: 200px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  z-index: 2;
+}
+
+form label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+form input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  background: var(--navy);
+  color: #fff;
+  border: 0;
+  cursor: pointer;
+}
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-top: 8px;
+}
+
+.swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+}
+
+.swatch.high {
+  background: var(--high);
+}
+.swatch.mid {
+  background: var(--mid);
+}
+.swatch.low {
+  background: var(--low);
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+@media (max-width: 800px) {
+  #app {
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px auto 50vh auto;
+    grid-template-areas:
+      "topbar"
+      "recommend"
+      "map"
+      "layers";
+  }
+
+  .layers {
+    width: auto;
+  }
+
+  .legend {
+    right: 12px;
+    bottom: 12px;
+  }
+}
