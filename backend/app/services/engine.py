@@ -3,7 +3,7 @@
 The kitchen does not invent numbers. It only uses numbers already on the scored sheet.
 """
 
-from app.schemas.recommend import RecommendRequest, RecommendResponse, RecommendationCard
+from app.schemas.recommend import RecommendationCard, RecommendRequest, RecommendResponse
 
 
 def _flood_label(card: dict) -> str:

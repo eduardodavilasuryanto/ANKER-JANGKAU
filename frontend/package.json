@@ -6,12 +6,21 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "lint": "oxlint src",
+    "format": "prettier --write \"src/**/*.{js,jsx,css}\" \"*.{js,html}\"",
     "preview": "vite preview"
   },
   "dependencies": {
-    "maplibre-gl": "^4.7.1"
+    "@ant-design/icons": "^6.3.4",
+    "antd": "^6.6.2",
+    "maplibre-gl": "^4.7.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "vite": "^5.4.10"
+    "@vitejs/plugin-react": "^6.1.0",
+    "oxlint": "^1.79.0",
+    "prettier": "^3.8.2",
+    "vite": "^8.2.2"
   }
 }

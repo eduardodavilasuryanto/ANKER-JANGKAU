@@ -1,0 +1,6 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "name": "Prototype Lin Bogor" }, "geometry": { "type": "LineString", "coordinates": [[106.816,-6.149],[106.851,-6.214],[106.855,-6.231],[106.828,-6.360],[106.794,-6.594]] } }
+  ]
+}

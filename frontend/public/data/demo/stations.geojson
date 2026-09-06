@@ -1,0 +1,10 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    { "type": "Feature", "properties": { "station_id": "JKT", "station_name": "Jakarta Kota", "housing_price": 2250000 }, "geometry": { "type": "Point", "coordinates": [106.816,-6.149] } },
+    { "type": "Feature", "properties": { "station_id": "MGR", "station_name": "Manggarai", "housing_price": 1900000 }, "geometry": { "type": "Point", "coordinates": [106.851,-6.214] } },
+    { "type": "Feature", "properties": { "station_id": "TBT", "station_name": "Tebet", "housing_price": 1600000 }, "geometry": { "type": "Point", "coordinates": [106.855,-6.231] } },
+    { "type": "Feature", "properties": { "station_id": "PDC", "station_name": "Pondok Cina", "housing_price": 1350000 }, "geometry": { "type": "Point", "coordinates": [106.828,-6.360] } },
+    { "type": "Feature", "properties": { "station_id": "BGR", "station_name": "Bogor", "housing_price": 900000 }, "geometry": { "type": "Point", "coordinates": [106.794,-6.594] } }
+  ]
+}

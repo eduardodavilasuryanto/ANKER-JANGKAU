@@ -1,7 +1,6 @@
 from app.schemas.recommend import RecommendRequest
 from app.services.engine import recommend
 
-
 SAMPLE_ROWS = [
     {
         "station_id": "TEB",

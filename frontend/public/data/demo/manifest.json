@@ -1,0 +1,9 @@
+{
+  "dataset_version": "prototype-demo-2026-09-06",
+  "is_demo": true,
+  "artifacts": {
+    "catchments": "/data/demo/catchments.geojson",
+    "stations": "/data/demo/stations.geojson",
+    "network": "/data/demo/network.geojson"
+  }
+}
