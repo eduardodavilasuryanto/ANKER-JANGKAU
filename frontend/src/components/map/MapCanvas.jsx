@@ -14,6 +14,22 @@ const LAYER_IDS = [
   "ai-highlight",
 ];
 
+function getBounds(
+  coordinates,
+  bounds = [Infinity, Infinity, -Infinity, -Infinity],
+) {
+  if (typeof coordinates[0] === "number") {
+    bounds[0] = Math.min(bounds[0], coordinates[0]);
+    bounds[1] = Math.min(bounds[1], coordinates[1]);
+    bounds[2] = Math.max(bounds[2], coordinates[0]);
+    bounds[3] = Math.max(bounds[3], coordinates[1]);
+    return bounds;
+  }
+
+  coordinates.forEach((coordinate) => getBounds(coordinate, bounds));
+  return bounds;
+}
+
 export function MapCanvas({
   release,
   activeLayers,
@@ -32,6 +48,8 @@ export function MapCanvas({
       style: MAP_DEFAULTS.style,
       center: MAP_DEFAULTS.center,
       zoom: MAP_DEFAULTS.zoom,
+      pitch: MAP_DEFAULTS.pitch,
+      bearing: MAP_DEFAULTS.bearing,
       attributionControl: true,
     });
 
@@ -236,10 +254,32 @@ export function MapCanvas({
       ]);
   }, [activeLayers, mapReady, recommendationIds, release, selectedStationId]);
 
+  useEffect(() => {
+    const map = mapRef.current;
+    const selectedFeature = release?.artifacts?.catchments?.features.find(
+      (feature) => feature.properties.station_id === selectedStationId,
+    );
+
+    if (!mapReady || !map || !selectedFeature?.geometry?.coordinates) return;
+
+    const [west, south, east, north] = getBounds(
+      selectedFeature.geometry.coordinates,
+    );
+    if (![west, south, east, north].every(Number.isFinite)) return;
+
+    map.fitBounds(
+      [
+        [west, south],
+        [east, north],
+      ],
+      { padding: 96, maxZoom: 13, duration: 500 },
+    );
+  }, [mapReady, release, selectedStationId]);
+
   return (
     <div
       ref={containerRef}
-      className="map"
+      className="absolute inset-0"
       role="application"
       aria-label="Peta kawasan stasiun Lin Bogor"
     />

@@ -6,13 +6,14 @@ Picture a school cafeteria kitchen. The map in `frontend/` is the lunch line win
 
 ## Run
 
-```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
 ```
+
+On Windows PowerShell, activate with `\.venv\Scripts\Activate.ps1` instead. From the repository root, `./scripts/dev.sh` starts this service and the frontend together on macOS/Linux; `./scripts/dev.ps1` does the same on Windows.
 
 Open `http://localhost:8000/docs` to see the live menu of routes.
 

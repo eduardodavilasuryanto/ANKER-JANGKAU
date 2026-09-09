@@ -1,0 +1,4 @@
+{
+  "r2_buckets": [{ "binding": "RELEASES", "bucket_name": "jangkau-releases" }],
+  "d1_databases": [{ "binding": "RELEASE_REGISTRY", "database_name": "jangkau-releases", "database_id": "REPLACE_WITH_D1_ID" }]
+}
