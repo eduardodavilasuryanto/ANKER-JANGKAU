@@ -9,3 +9,42 @@ body {
   min-width: 320px;
   margin: 0;
 }
+
+@keyframes landing-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(1.025);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.landing-background {
+  background-image: url("/landing-background.avif");
+  background-position: center;
+  background-size: cover;
+  animation: landing-fade-in 900ms ease-out both;
+}
+
+.landing-curve-overlay {
+  background:
+    radial-gradient(
+      115% 50% at 50% -8%,
+      transparent 46%,
+      rgba(0, 0, 0, 0.7) 78%
+    ),
+    radial-gradient(
+      105% 58% at 50% 108%,
+      rgba(2, 20, 13, 0.15) 0%,
+      rgba(0, 0, 0, 0.86) 76%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.78) 0%,
+      rgba(0, 0, 0, 0.25) 44%,
+      rgba(0, 0, 0, 0.8) 100%
+    );
+}

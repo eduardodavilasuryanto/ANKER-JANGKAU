@@ -41,26 +41,52 @@ export function MapCanvas({
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const [mapReady, setMapReady] = useState(false);
+  const [mapUnavailable, setMapUnavailable] = useState(false);
 
   useEffect(() => {
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: MAP_DEFAULTS.style,
-      center: MAP_DEFAULTS.center,
-      zoom: MAP_DEFAULTS.zoom,
-      pitch: MAP_DEFAULTS.pitch,
-      bearing: MAP_DEFAULTS.bearing,
-      attributionControl: true,
-    });
+    let map;
+    let animationFrame;
 
-    map.addControl(new maplibregl.NavigationControl(), "top-right");
-    map.on("load", () => setMapReady(true));
-    map.on("error", (event) =>
-      onMapError(event.error?.message || "Peta tidak dapat dimuat."),
-    );
-    mapRef.current = map;
+    function startMap() {
+      const container = containerRef.current;
+      if (!container) return;
 
-    return () => map.remove();
+      try {
+        map = new maplibregl.Map({
+          container,
+          style: MAP_DEFAULTS.style,
+          center: MAP_DEFAULTS.center,
+          zoom: MAP_DEFAULTS.zoom,
+          pitch: MAP_DEFAULTS.pitch,
+          bearing: MAP_DEFAULTS.bearing,
+          attributionControl: true,
+        });
+      } catch (error) {
+        setMapUnavailable(true);
+        onMapError(
+          error.message || "Peta tidak dapat dimulai pada perangkat ini.",
+        );
+        return;
+      }
+
+      map.addControl(new maplibregl.NavigationControl(), "top-right");
+      map.on("load", () => {
+        map.resize();
+        setMapReady(true);
+      });
+      map.on("error", (event) =>
+        onMapError(event.error?.message || "Peta tidak dapat dimuat."),
+      );
+      mapRef.current = map;
+    }
+
+    animationFrame = requestAnimationFrame(startMap);
+
+    return () => {
+      cancelAnimationFrame(animationFrame);
+      map?.remove();
+      mapRef.current = null;
+    };
   }, [onMapError]);
 
   useEffect(() => {
@@ -137,8 +163,10 @@ export function MapCanvas({
       source: "catchments",
       paint: {
         "fill-color": [
-          "step",
-          ["get", "flood_risk_score"],
+          "interpolate",
+          ["linear"],
+          ["coalesce", ["get", "flood_risk_score"], 0],
+          0,
           "#fef3c7",
           0.5,
           "#d97706",
@@ -276,10 +304,19 @@ export function MapCanvas({
     );
   }, [mapReady, release, selectedStationId]);
 
+  if (mapUnavailable) {
+    return (
+      <div className="absolute inset-0 grid place-items-center bg-[#dfe5e1] p-6 text-center text-sm leading-6 text-neutral-700">
+        Peta membutuhkan WebGL. Aktifkan akselerasi perangkat keras pada
+        browser, lalu muat ulang halaman.
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0"
+      className="w-full h-full inset-0"
       role="application"
       aria-label="Peta kawasan stasiun Lin Bogor"
     />

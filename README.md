@@ -6,7 +6,7 @@ Jangkau scores Bogor Line station areas on one 0 to 100 report card: rent, commu
 
 ## Run locally
 
-Install Node.js 20+ and Python 3.11+. The local prototype works with its bundled demonstration data; a live MAPID basemap and production data release need their team-owned configuration.
+Install Node.js 20+, Python 3.13+, and [uv](https://docs.astral.sh/uv/). The local prototype works with its bundled demonstration data; a live MAPID basemap and production data release need their team-owned configuration.
 
 ### macOS and Linux
 
@@ -31,10 +31,8 @@ Use this when you want separate terminals or need to inspect one service at a ti
 ```bash
 # Terminal 1: FastAPI
 cd backend
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python -m uvicorn app.main:app --reload --port 8000
+uv sync --group dev
+uv run uvicorn app.main:app --reload --port 8000
 ```
 
 ```bash
@@ -55,11 +53,10 @@ For a real MAPID basemap, create `frontend/.env.local` and set `VITE_MAPID_STYLE
 
 ```
 frontend/     map, 7 layers, recommend form   (WebGIS Developer, UI/UX)
-backend/      POST /api/v1/recommend          (WebGIS Developer)
+backend/      FastAPI Cloudflare Worker + D1  (WebGIS Developer)
 pipeline/     ingest, clean, join, score      (AI / Data)
 data/         pantry: raw is sealed           (AI / Data)
 docs/         this team's how-to              (Project Lead)
-infra/        public host config              (WebGIS Developer)
 scripts/      Windows setup and run           (all)
 ```
 

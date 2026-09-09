@@ -1,0 +1,3 @@
+# Copy to .dev.vars for pywrangler dev. Keep the real values out of git.
+AI_RECOMMENDATION_API_URL=https://api.example.com/recommend
+AI_RECOMMENDATION_API_KEY=replace-with-team-owned-key

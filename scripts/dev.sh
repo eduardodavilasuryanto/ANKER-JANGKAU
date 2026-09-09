@@ -5,18 +5,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
-if [[ ! -x "$ROOT_DIR/backend/.venv/bin/python" ]]; then
-  echo "Backend environment is missing. Run ./scripts/setup.sh first." >&2
-  exit 1
-fi
-
 cleanup() {
   kill "$BACKEND_PID" "$FRONTEND_PID" 2>/dev/null || true
 }
 
 (
   cd "$ROOT_DIR/backend"
-  exec .venv/bin/python -m uvicorn app.main:app --reload --port 8000
+  exec uv run uvicorn app.main:app --reload --port 8000
 ) &
 BACKEND_PID=$!
 

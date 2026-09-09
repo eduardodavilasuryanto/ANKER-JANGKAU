@@ -1,9 +1,26 @@
 [project]
 name = "jangkau-api"
 version = "0.1.0"
-description = "Jangkau recommendation kitchen: filter, rank, and fill the sentence cards."
-requires-python = ">=3.11"
+description = "Jangkau API: AI recommendation proxy, accounts, and saved searches."
+requires-python = ">=3.13"
 readme = "README.md"
+dependencies = [
+    "fastapi>=0.115.0",
+    "httpx2>=0.1.0",
+    "pydantic[email]>=2.9.0",
+    "pydantic-settings>=2.5.0",
+    "python-dotenv>=1.0.1",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.0",
+    "pytest>=8.3.0",
+    "ruff>=0.15.0",
+    "workers-py",
+    "workers-runtime-sdk",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

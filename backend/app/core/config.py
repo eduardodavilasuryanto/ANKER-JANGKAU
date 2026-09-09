@@ -6,7 +6,8 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_host: str = "0.0.0.0"
     app_port: int = 8000
-    scored_geojson_path: str = "../data/outputs/jangkau_bogor_line_scored.geojson"
+    ai_recommendation_api_url: str = ""
+    ai_recommendation_api_key: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env",

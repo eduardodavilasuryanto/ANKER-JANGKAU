@@ -1,13 +1,26 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Button, Drawer, Form, InputNumber, Select } from "antd";
+import { Button, Drawer, Form, Input, InputNumber, Select } from "antd";
 import {
   ArrowRightOutlined,
+  DeleteOutlined,
   EnvironmentOutlined,
+  LoginOutlined,
+  SaveOutlined,
   SearchOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { MapCanvas } from "./components/map/MapCanvas.jsx";
-import { fetchRecommendations } from "./services/api.js";
+import {
+  deleteSavedSearch,
+  fetchRecommendations,
+  fetchSavedSearches,
+  login,
+  logout,
+  saveSearch,
+  signUp,
+} from "./services/api.js";
 import { createDemoRecommendations } from "./services/demoRecommendations.js";
 import { loadRelease } from "./services/datasets.js";
 import { formatMinutes, formatRupiah, formatScore } from "./utils/format.js";
@@ -18,7 +31,7 @@ const formLabelClass = "!pb-1.5 !text-[13px] !font-medium !text-[#1b1b1b]";
 function RecommendationForm({ stations, apiStatus, onSubmit }) {
   return (
     <section className="border-b border-black/10 pb-7">
-      <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#426188]">
+      <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
         PREFERENSI KAMU
       </p>
       <h1 className="m-0 text-[28px] leading-[1.1] font-medium tracking-[-0.045em] text-[#1b1b1b]">
@@ -81,8 +94,8 @@ function RecommendationForm({ stations, apiStatus, onSubmit }) {
         </Form.Item>
         <Form.Item className="!m-0">
           <Button
-            className="!h-[42px] !rounded-lg !border-[#1b1b1b] !bg-[#f5f5f5] !text-[#1b1b1b] !shadow-none hover:!bg-white"
-            type="default"
+            className="!h-[42px] !rounded-lg !border-[#0c8c5e] !bg-[#0c8c5e] !text-white !shadow-none hover:!border-[#087a51] hover:!bg-[#087a51]"
+            type="primary"
             htmlType="submit"
             icon={<SearchOutlined />}
             disabled={stations.length === 0}
@@ -97,7 +110,7 @@ function RecommendationForm({ stations, apiStatus, onSubmit }) {
   );
 }
 
-function ResultsPanel({ apiStatus, results, onSelect }) {
+function ResultsPanel({ apiStatus, results, onSave, onSelect, saveStatus }) {
   if (apiStatus === "idle" || apiStatus === "empty" || apiStatus === "error") {
     const content = {
       idle: [
@@ -116,7 +129,7 @@ function ResultsPanel({ apiStatus, results, onSelect }) {
 
     return (
       <section className="pt-7">
-        <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#426188]">
+        <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
           HASIL PENCARIAN
         </p>
         <h2 className="m-0 text-xl leading-[1.1] font-medium tracking-[-0.04em] text-[#1b1b1b]">
@@ -133,7 +146,7 @@ function ResultsPanel({ apiStatus, results, onSelect }) {
     <section className="pt-7" aria-live="polite">
       <div className="grid gap-2.5">
         <div>
-          <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#426188]">
+          <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
             HASIL PENCARIAN
           </p>
           <h2 className="m-0 text-xl leading-[1.1] font-medium tracking-[-0.04em] text-[#1b1b1b]">
@@ -152,7 +165,7 @@ function ResultsPanel({ apiStatus, results, onSelect }) {
             type="button"
             onClick={() => onSelect(result.station_id)}
           >
-            <span className="text-xs font-semibold text-[#426188]">
+            <span className="text-xs font-semibold text-[#0c8c5e]">
               {String(index + 1).padStart(2, "0")}
             </span>
             <span className="grid min-w-0 gap-1">
@@ -170,7 +183,149 @@ function ResultsPanel({ apiStatus, results, onSelect }) {
           </button>
         ))}
       </div>
+      <Button
+        className="!mt-5 !h-10 !rounded-lg !border-[#1b1b1b] !bg-white !text-[#1b1b1b] !shadow-none"
+        icon={<SaveOutlined />}
+        loading={saveStatus === "saving"}
+        onClick={onSave}
+        block
+      >
+        {saveStatus === "saved" ? "Pencarian tersimpan" : "Simpan pencarian"}
+      </Button>
     </section>
+  );
+}
+
+function AccountDrawer({
+  onClose,
+  onDeleteSearch,
+  onLoadSearch,
+  onLogout,
+  onSubmit,
+  open,
+  savedSearches,
+  session,
+}) {
+  const [mode, setMode] = useState("login");
+
+  if (session) {
+    return (
+      <Drawer title="Akun saya" open={open} onClose={onClose} width={360}>
+        <div className="grid gap-6">
+          <div>
+            <p className="m-0 text-base font-medium text-[#1b1b1b]">
+              {session.user.name}
+            </p>
+            <p className="mt-1 mb-0 text-sm text-neutral-600">
+              {session.user.email}
+            </p>
+          </div>
+          <section>
+            <h2 className="m-0 text-sm font-semibold text-[#1b1b1b]">
+              Pencarian tersimpan
+            </h2>
+            {savedSearches.length ? (
+              <div className="mt-3 grid divide-y divide-black/10 border-y border-black/10">
+                {savedSearches.map((search) => (
+                  <div className="flex items-center gap-2 py-3" key={search.id}>
+                    <button
+                      className="min-w-0 flex-1 border-0 bg-transparent p-0 text-left"
+                      type="button"
+                      onClick={() => onLoadSearch(search)}
+                    >
+                      <strong className="block truncate text-sm font-medium text-[#1b1b1b]">
+                        {search.label}
+                      </strong>
+                      <span className="mt-1 block text-xs text-neutral-500">
+                        {new Date(search.updated_at).toLocaleDateString(
+                          "id-ID",
+                        )}
+                      </span>
+                    </button>
+                    <Button
+                      aria-label={`Hapus ${search.label}`}
+                      icon={<DeleteOutlined />}
+                      type="text"
+                      onClick={() => onDeleteSearch(search.id)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 mb-0 text-sm leading-6 text-neutral-600">
+                Simpan pencarian untuk membukanya lagi di sini.
+              </p>
+            )}
+          </section>
+          <Button icon={<LoginOutlined />} onClick={onLogout}>
+            Keluar
+          </Button>
+        </div>
+      </Drawer>
+    );
+  }
+
+  const isSignUp = mode === "sign-up";
+  return (
+    <Drawer
+      title={isSignUp ? "Buat akun" : "Masuk"}
+      open={open}
+      onClose={onClose}
+      width={360}
+    >
+      <p className="mt-0 mb-6 text-sm leading-6 text-neutral-600">
+        Masuk untuk menyimpan pencarian dan membukanya kembali nanti.
+      </p>
+      <Form
+        className="grid gap-1"
+        layout="vertical"
+        onFinish={(values) => onSubmit(mode, values)}
+      >
+        {isSignUp ? (
+          <Form.Item
+            label="Nama"
+            name="name"
+            rules={[{ required: true, message: "Masukkan nama." }]}
+          >
+            <Input autoComplete="name" />
+          </Form.Item>
+        ) : null}
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            {
+              required: true,
+              type: "email",
+              message: "Masukkan email yang valid.",
+            },
+          ]}
+        >
+          <Input autoComplete="email" inputMode="email" />
+        </Form.Item>
+        <Form.Item
+          label="Kata sandi"
+          name="password"
+          rules={[
+            { required: true, min: 8, message: "Gunakan minimal 8 karakter." },
+          ]}
+        >
+          <Input.Password
+            autoComplete={isSignUp ? "new-password" : "current-password"}
+          />
+        </Form.Item>
+        <Button className="!mt-2 !h-10" htmlType="submit" type="primary">
+          {isSignUp ? "Buat akun" : "Masuk"}
+        </Button>
+      </Form>
+      <Button
+        className="!mt-4 !px-0"
+        type="link"
+        onClick={() => setMode(isSignUp ? "login" : "sign-up")}
+      >
+        {isSignUp ? "Sudah punya akun? Masuk" : "Belum punya akun? Buat akun"}
+      </Button>
+    </Drawer>
   );
 }
 
@@ -186,7 +341,7 @@ function AreaDetail({ release, selected }) {
 
   return (
     <div className="p-2">
-      <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#426188]">
+      <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
         KAWASAN TERPILIH
       </p>
       <div className="flex items-baseline justify-between gap-4">
@@ -235,7 +390,9 @@ function MapStatus({ message, dark = false }) {
 }
 
 export default function App() {
-  const [screen, setScreen] = useState("landing");
+  const location = useLocation();
+  const navigate = useNavigate();
+  const isSearchRoute = location.pathname === "/cari-kawasan";
   const [release, setRelease] = useState({ status: "loading" });
   const [selectedStationId, setSelectedStationId] = useState("");
   const [recommendationIds, setRecommendationIds] = useState([]);
@@ -243,6 +400,19 @@ export default function App() {
   const [apiStatus, setApiStatus] = useState("idle");
   const [mapError, setMapError] = useState("");
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [lastSearch, setLastSearch] = useState(null);
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const [savedSearches, setSavedSearches] = useState([]);
+  const [session, setSession] = useState(() => {
+    try {
+      return JSON.parse(
+        window.localStorage.getItem("jangkau-session") || "null",
+      );
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     const controller = new AbortController();
@@ -269,14 +439,96 @@ export default function App() {
     release.reason ||
     (release.status !== "ready" ? "Memuat peta dan data…" : "");
 
-  function openSearch() {
-    setScreen("search");
+  const openSearch = useCallback(() => {
+    navigate("/cari-kawasan");
+  }, [navigate]);
+
+  const loadSavedSearches = useCallback(async (token) => {
+    try {
+      setSavedSearches(await fetchSavedSearches(token));
+    } catch {
+      setSavedSearches([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (session?.token) {
+      loadSavedSearches(session.token);
+    }
+  }, [loadSavedSearches, session?.token]);
+
+  function setAuthenticatedSession(nextSession) {
+    window.localStorage.setItem("jangkau-session", JSON.stringify(nextSession));
+    setSession(nextSession);
   }
 
-  function selectArea(stationId) {
+  async function submitAccount(mode, values) {
+    try {
+      const nextSession =
+        mode === "sign-up" ? await signUp(values) : await login(values);
+      setAuthenticatedSession(nextSession);
+      setIsAccountOpen(false);
+    } catch (error) {
+      window.alert(error.message);
+    }
+  }
+
+  async function signOut() {
+    if (session?.token) {
+      await logout(session.token).catch(() => null);
+    }
+    window.localStorage.removeItem("jangkau-session");
+    setSavedSearches([]);
+    setSession(null);
+    setIsAccountOpen(false);
+  }
+
+  async function saveCurrentSearch() {
+    if (!lastSearch || !results.length) return;
+    if (!session?.token) {
+      setIsAccountOpen(true);
+      return;
+    }
+
+    setSaveStatus("saving");
+    try {
+      await saveSearch(session.token, {
+        label: `${lastSearch.work_station} · ${formatRupiah(lastSearch.budget)}`,
+        search_input: lastSearch,
+        search_result: { results },
+      });
+      await loadSavedSearches(session.token);
+      setSaveStatus("saved");
+    } catch (error) {
+      setSaveStatus("idle");
+      window.alert(error.message);
+    }
+  }
+
+  async function removeSavedSearch(savedSearchId) {
+    if (!session?.token) return;
+    try {
+      await deleteSavedSearch(session.token, savedSearchId);
+      await loadSavedSearches(session.token);
+    } catch (error) {
+      window.alert(error.message);
+    }
+  }
+
+  function loadSavedSearch(savedSearch) {
+    const savedResults = savedSearch.search_result?.results || [];
+    setResults(savedResults);
+    setRecommendationIds(savedResults.map((item) => item.station_id));
+    setLastSearch(savedSearch.search_input);
+    setApiStatus(savedResults.length ? "success" : "empty");
+    navigate("/cari-kawasan");
+    setIsAccountOpen(false);
+  }
+
+  const selectArea = useCallback((stationId) => {
     setSelectedStationId(stationId);
     setIsDetailOpen(true);
-  }
+  }, []);
 
   async function submitRecommendation(values) {
     setApiStatus("loading");
@@ -299,6 +551,8 @@ export default function App() {
       const nextResults = body.results || [];
       setResults(nextResults);
       setRecommendationIds(nextResults.map((item) => item.station_id));
+      setLastSearch(payload);
+      setSaveStatus("idle");
       setApiStatus(nextResults.length ? "success" : "empty");
     } catch {
       setResults([]);
@@ -313,17 +567,20 @@ export default function App() {
       activeLayers={SEARCH_LAYERS}
       selectedStationId={selectedStationId}
       recommendationIds={recommendationIds}
-      onSelect={screen === "landing" ? openSearch : selectArea}
+      onSelect={isSearchRoute ? selectArea : openSearch}
       onMapError={onMapError}
     />
   );
 
-  if (screen === "landing") {
+  if (!isSearchRoute) {
     return (
       <main className="relative grid min-h-screen grid-rows-[auto_1fr_auto] overflow-hidden bg-black font-sans text-white">
-        <div className="absolute inset-0" aria-hidden="true">
-          {map}
-          <div className="absolute inset-0 bg-black/67" />
+        <div
+          className="absolute inset-0 overflow-hidden bg-[#06130d]"
+          aria-hidden="true"
+        >
+          <div className="landing-background absolute inset-0" />
+          <div className="landing-curve-overlay absolute inset-0" />
         </div>
         <header className="relative z-1 flex h-[72px] items-center justify-between border-b border-white/20 px-8 text-sm font-medium max-[480px]:px-4">
           <a
@@ -332,13 +589,20 @@ export default function App() {
           >
             JANGKAU
           </a>
-          <span>Lin Bogor</span>
+          <Button
+            className="!text-white"
+            type="text"
+            icon={<UserOutlined />}
+            onClick={() => setIsAccountOpen(true)}
+          >
+            {session ? session.user.name : "Masuk"}
+          </Button>
         </header>
         <section
           className="relative z-1 w-[calc(100%-48px)] max-w-[760px] self-center justify-self-center py-20 text-center max-[480px]:w-[calc(100%-32px)] max-[480px]:max-w-[560px]"
           id="top"
         >
-          <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#b8cce6]">
+          <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#a7e4c7]">
             TEMUKAN TEMPAT PULANGMU
           </p>
           <h1 className="m-0 text-[clamp(44px,7vw,82px)] leading-[0.98] font-medium tracking-[-0.065em]">
@@ -349,8 +613,8 @@ export default function App() {
             waktu perjalananmu.
           </p>
           <Button
-            className="!mt-8 !h-auto !rounded-lg !border-white !bg-[#f5f5f5] !px-[18px] !py-[11px] !text-black !shadow-none hover:!bg-white"
-            type="default"
+            className="!mt-8 !h-auto !rounded-lg !border-[#0c8c5e] !bg-[#0c8c5e] !px-[18px] !py-[11px] !text-white !shadow-none hover:!border-[#087a51] hover:!bg-[#087a51]"
+            type="primary"
             size="large"
             icon={<ArrowRightOutlined />}
             iconPosition="end"
@@ -362,7 +626,16 @@ export default function App() {
         <div className="relative z-1 flex items-center gap-2 px-8 pb-6 text-[13px] text-white/75 max-[480px]:px-4 max-[480px]:pb-5">
           <EnvironmentOutlined /> Lin Bogor
         </div>
-        <MapStatus message={mapStatus} dark />
+        <AccountDrawer
+          open={isAccountOpen}
+          session={session}
+          savedSearches={savedSearches}
+          onClose={() => setIsAccountOpen(false)}
+          onSubmit={submitAccount}
+          onLogout={signOut}
+          onLoadSearch={loadSavedSearch}
+          onDeleteSearch={removeSavedSearch}
+        />
       </main>
     );
   }
@@ -373,13 +646,19 @@ export default function App() {
         <button
           className="border-0 bg-transparent p-0 text-base font-semibold tracking-[-0.05em]"
           type="button"
-          onClick={() => setScreen("landing")}
+          onClick={() => navigate("/")}
         >
           JANGKAU
         </button>
-        <Button type="text" onClick={() => setScreen("landing")}>
-          Mulai lagi
-        </Button>
+        <div className="flex items-center gap-1">
+          <Button
+            type="text"
+            icon={<UserOutlined />}
+            onClick={() => setIsAccountOpen(true)}
+          >
+            {session ? session.user.name : "Masuk"}
+          </Button>
+        </div>
       </header>
       <div className="grid min-h-[calc(100vh-64px)] grid-cols-[minmax(340px,430px)_minmax(0,1fr)] max-[800px]:flex max-[800px]:flex-col">
         <aside className="z-2 overflow-y-auto border-r border-black/10 bg-white p-6 max-[800px]:overflow-visible max-[480px]:p-4">
@@ -391,11 +670,13 @@ export default function App() {
           <ResultsPanel
             apiStatus={apiStatus}
             results={results}
+            saveStatus={saveStatus}
+            onSave={saveCurrentSearch}
             onSelect={selectArea}
           />
         </aside>
         <section
-          className="relative min-h-[540px] overflow-hidden bg-[#dfe5e1] max-[800px]:min-h-[62vh]"
+          className="relative min-h-[540px] bg-[#dfe5e1] max-[800px]:min-h-[62vh]"
           aria-label="Peta kawasan Lin Bogor"
         >
           {map}
@@ -414,6 +695,16 @@ export default function App() {
       >
         <AreaDetail release={release} selected={selected} />
       </Drawer>
+      <AccountDrawer
+        open={isAccountOpen}
+        session={session}
+        savedSearches={savedSearches}
+        onClose={() => setIsAccountOpen(false)}
+        onSubmit={submitAccount}
+        onLogout={signOut}
+        onLoadSearch={loadSavedSearch}
+        onDeleteSearch={removeSavedSearch}
+      />
     </main>
   );
 }

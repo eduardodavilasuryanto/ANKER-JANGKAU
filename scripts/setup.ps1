@@ -10,11 +10,11 @@ if (-not (Test-Path ".env")) {
   Write-Host "Created .env from .env.example. Fill MAPID keys later."
 }
 
-if (-not (Test-Path "backend\.venv")) {
-  python -m venv "backend\.venv"
+if (-not (Get-Command uv -ErrorAction SilentlyContinue)) {
+  throw "uv is required. Install it from https://docs.astral.sh/uv/."
 }
 
-& "backend\.venv\Scripts\python.exe" -m pip install -r "backend\requirements.txt"
+uv sync --directory "backend" --group dev
 
 if (Get-Command npm -ErrorAction SilentlyContinue) {
   Set-Location "frontend"
