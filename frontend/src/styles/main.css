@@ -8,6 +8,26 @@
 body {
   min-width: 320px;
   margin: 0;
+  background: var(--page-bg);
+}
+
+:root,
+.theme-light {
+  --page-bg: #f3f5f3;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --text: #172019;
+  --muted: #5c665f;
+  --border: rgba(23, 32, 25, 0.14);
+}
+
+.theme-dark {
+  --page-bg: #101713;
+  --surface: #172019;
+  --surface-raised: #202b23;
+  --text: #f4f7f3;
+  --muted: #b5beb6;
+  --border: rgba(244, 247, 243, 0.16);
 }
 
 @keyframes landing-fade-in {
@@ -26,25 +46,74 @@ body {
   background-image: url("/landing-background.avif");
   background-position: center;
   background-size: cover;
+  opacity: 0.22;
   animation: landing-fade-in 900ms ease-out both;
 }
 
 .landing-curve-overlay {
   background:
     radial-gradient(
-      115% 50% at 50% -8%,
-      transparent 46%,
-      rgba(0, 0, 0, 0.7) 78%
-    ),
-    radial-gradient(
-      105% 58% at 50% 108%,
-      rgba(2, 20, 13, 0.15) 0%,
-      rgba(0, 0, 0, 0.86) 76%
+      90% 55% at 50% 46%,
+      rgba(12, 112, 73, 0.2),
+      transparent 30%
     ),
     linear-gradient(
       180deg,
-      rgba(0, 0, 0, 0.78) 0%,
-      rgba(0, 0, 0, 0.25) 44%,
-      rgba(0, 0, 0, 0.8) 100%
+      rgba(0, 0, 0, 0.6),
+      rgba(0, 0, 0, 0.1) 48%,
+      rgba(0, 0, 0, 0.66)
     );
+}
+
+.landing-curve-overlay::before,
+.landing-curve-overlay::after {
+  position: absolute;
+  right: -14%;
+  left: -14%;
+  height: 32%;
+  content: "";
+  pointer-events: none;
+}
+
+.landing-curve-overlay::before {
+  top: -10%;
+  border-radius: 0 0 50% 50%;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.94), rgba(0, 0, 0, 0.06));
+}
+
+.landing-curve-overlay::after {
+  bottom: -12%;
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.96), rgba(0, 0, 0, 0.08));
+}
+
+.landing-page.theme-light .landing-curve-overlay {
+  background:
+    radial-gradient(
+      90% 55% at 50% 46%,
+      rgba(61, 152, 107, 0.16),
+      transparent 68%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(245, 251, 246, 0.76),
+      rgba(245, 251, 246, 0.14) 48%,
+      rgba(245, 251, 246, 0.8)
+    );
+}
+
+.landing-page.theme-light .landing-curve-overlay::before {
+  background: linear-gradient(
+    180deg,
+    rgba(248, 252, 248, 0.94),
+    rgba(248, 252, 248, 0.08)
+  );
+}
+
+.landing-page.theme-light .landing-curve-overlay::after {
+  background: linear-gradient(
+    0deg,
+    rgba(248, 252, 248, 0.96),
+    rgba(248, 252, 248, 0.08)
+  );
 }
