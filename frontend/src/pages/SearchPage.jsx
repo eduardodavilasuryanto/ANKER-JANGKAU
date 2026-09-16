@@ -1,11 +1,13 @@
-import { SaveOutlined, SearchOutlined } from "@ant-design/icons";
-import { Button, Drawer, Form, InputNumber, Select } from "antd";
+import { SaveOutlined, SearchOutlined, DownOutlined, UpOutlined, InfoCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
+import { Button, Drawer, Form, InputNumber, Select, Slider } from "antd";
+import { useState } from "react";
 
 import { AppNavbar } from "../components/AppNavbar.jsx";
 import { MapCanvas } from "../components/map/MapCanvas.jsx";
+import { LayerPanel } from "../components/layers/LayerPanel.jsx";
+import { MapLegend } from "../components/ui/MapLegend.jsx";
 import { formatMinutes, formatRupiah, formatScore } from "../utils/format.js";
 
-const SEARCH_LAYERS = ["affordability", "krl-network", "ai-highlight"];
 const formLabelClass = "!pb-1.5 !text-[13px] !font-medium";
 
 function RecommendationForm({ apiStatus, stations, onSubmit }) {
@@ -22,27 +24,23 @@ function RecommendationForm({ apiStatus, stations, onSubmit }) {
       </p>
       <Form
         className="grid gap-3.5"
-        initialValues={{ budget: 1800000, max_commute: 35 }}
+        initialValues={{ budget: [1000000, 3000000], max_commute: 35 }}
         layout="vertical"
         onFinish={onSubmit}
       >
         <Form.Item
           className="!m-0"
-          label="Anggaran sewa bulanan (Rp)"
+          label="Rentang anggaran sewa (Rp)"
           labelCol={{ className: formLabelClass }}
           name="budget"
-          rules={[{ required: true, message: "Masukkan anggaran sewa." }]}
+          rules={[{ required: true, message: "Pilih rentang anggaran sewa." }]}
         >
-          <InputNumber
-            className="!w-full"
-            controls={false}
-            formatter={(value) =>
-              value === undefined || value === null
-                ? ""
-                : new Intl.NumberFormat("id-ID").format(value)
-            }
-            min={100000}
-            parser={(value) => Number(String(value || "").replace(/\D/g, ""))}
+          <Slider
+            range
+            min={500000}
+            max={10000000}
+            step={100000}
+            tooltip={{ formatter: (v) => formatRupiah(v) }}
           />
         </Form.Item>
         <Form.Item
@@ -65,12 +63,22 @@ function RecommendationForm({ apiStatus, stations, onSubmit }) {
         </Form.Item>
         <Form.Item
           className="!m-0"
-          label="Waktu perjalanan satu arah (menit)"
+          label="Batas waktu perjalanan (satu arah)"
           labelCol={{ className: formLabelClass }}
           name="max_commute"
-          rules={[{ required: true, message: "Masukkan batas waktu." }]}
+          rules={[{ required: true, message: "Pilih batas waktu." }]}
         >
-          <InputNumber className="!w-full" controls={false} max={180} min={5} />
+          <Slider
+            min={15}
+            max={120}
+            step={5}
+            marks={{
+              15: '15m',
+              60: '60m',
+              120: '120m'
+            }}
+            tooltip={{ formatter: (v) => `${v} menit` }}
+          />
         </Form.Item>
         <Form.Item className="!m-0">
           <Button
@@ -134,28 +142,7 @@ function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
       </span>
       <div className="mt-[18px] grid gap-2">
         {results.map((result, index) => (
-          <button
-            className="grid w-full grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-t border-[var(--border)] bg-transparent py-3.5 text-left text-[var(--text)] last:border-b hover:[&_strong]:underline"
-            key={result.station_id}
-            type="button"
-            onClick={() => onSelect(result.station_id)}
-          >
-            <span className="text-xs font-semibold text-[#0c8c5e]">
-              {String(index + 1).padStart(2, "0")}
-            </span>
-            <span className="grid min-w-0 gap-1">
-              <strong className="text-[15px] font-medium">
-                {result.station_name}
-              </strong>
-              <small className="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--muted)]">
-                {formatRupiah(result.avg_rent)} / bulan ·{" "}
-                {formatMinutes(result.total_commute_time)}
-              </small>
-            </span>
-            <span className="text-lg font-semibold">
-              {formatScore(result.composite_score)}
-            </span>
-          </button>
+          <ResultCard key={result.station_id} result={result} index={index} onSelect={onSelect} />
         ))}
       </div>
       <Button
@@ -171,14 +158,76 @@ function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
   );
 }
 
-function AreaDetail({ release, selected }) {
+function ResultCard({ result, index, onSelect }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="border-t border-[var(--border)] last:border-b py-2">
+      <button
+        className="grid w-full grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 bg-transparent py-1.5 text-left text-[var(--text)] hover:[&_strong]:underline"
+        type="button"
+        onClick={() => onSelect(result.station_id)}
+      >
+        <span className="text-xs font-semibold text-[#0c8c5e]">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="grid min-w-0 gap-1">
+          <strong className="text-[15px] font-medium flex items-center gap-2">
+            {result.station_name}
+            {result.flood_risk_label && (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-sm border ${
+                result.flood_risk_score >= 1 ? 'border-red-300 text-red-600 bg-red-50' :
+                result.flood_risk_score >= 0.5 ? 'border-amber-300 text-amber-600 bg-amber-50' :
+                'border-green-300 text-green-600 bg-green-50'
+              }`}>
+                Banjir: {result.flood_risk_label}
+              </span>
+            )}
+          </strong>
+          <small className="overflow-hidden text-ellipsis whitespace-nowrap text-xs text-[var(--muted)]">
+            {formatRupiah(result.avg_rent)} / bulan ·{" "}
+            {formatMinutes(result.total_commute_time)}
+          </small>
+        </span>
+        <span className="text-lg font-semibold">
+          {formatScore(result.composite_score)}
+        </span>
+      </button>
+      {result.explanation && (
+        <div className="mt-1 pl-[40px] pr-2 pb-2">
+          <button
+            className="flex items-center gap-1 text-[11px] text-[#0c8c5e] bg-transparent border-0 p-0 hover:underline"
+            onClick={() => setExpanded(!expanded)}
+          >
+            <InfoCircleOutlined /> {expanded ? "Tutup penjelasan" : "Lihat penjelasan AI"}
+            {expanded ? <UpOutlined className="text-[9px]" /> : <DownOutlined className="text-[9px]" />}
+          </button>
+          {expanded && (
+            <p className="mt-2 mb-1 text-xs text-[var(--muted)] leading-relaxed bg-[var(--surface-raised)] p-2 rounded border border-[var(--border)]">
+              {result.explanation}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AreaDetail({ release, selected, results }) {
   if (!selected) return null;
   const metrics = [
     ["Sewa rata-rata", formatRupiah(selected.avg_rent)],
+    ["Biaya makan per porsi", formatRupiah(selected.avg_food_price)],
     ["Biaya hidup harian", formatRupiah(selected.avg_daily_spend)],
     ["Waktu ke kerja", formatMinutes(selected.total_commute_time)],
+    ["Area jangkauan", selected.isochrone_min ? `${selected.isochrone_min} menit` : "Belum tersedia"],
     ["Risiko banjir", selected.flood_risk_label || "Belum tersedia"],
+    ["Premi stasiun", formatRupiah(selected.station_premium_rate)],
+    ["Kluster AI", selected.hotspot_cluster || "Belum tersedia"],
   ];
+  
+  const resultMatch = results?.find(r => r.station_id === selected.station_id);
+
   return (
     <div className="p-2 text-[var(--text)]">
       <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
@@ -197,6 +246,19 @@ function AreaDetail({ release, selected }) {
           ? "Nilai ini merupakan estimasi interpolasi spasial."
           : "Nilai ini berasal dari data yang tersedia pada rilis saat ini."}
       </p>
+      
+      {resultMatch?.explanation && (
+        <div className="mb-6 bg-[#f0f9f5] dark:bg-[#0a2e1f] border border-[#a7e4c7] rounded-lg p-3.5">
+          <div className="flex items-center gap-2 mb-2 text-[#0c8c5e]">
+            <ThunderboltOutlined />
+            <span className="text-xs font-semibold tracking-[0.05em]">ANALISIS AI</span>
+          </div>
+          <p className="m-0 text-[13px] leading-relaxed text-[var(--text)]">
+            {resultMatch.explanation}
+          </p>
+        </div>
+      )}
+
       <dl className="m-0 grid grid-cols-2 gap-px border border-[var(--border)] bg-[var(--border)] max-[480px]:grid-cols-1">
         {metrics.map(([label, value]) => (
           <div className="bg-[var(--surface)] p-3.5" key={label}>
@@ -205,8 +267,9 @@ function AreaDetail({ release, selected }) {
           </div>
         ))}
       </dl>
-      <p className="mt-5 mb-0 text-sm leading-6 text-[var(--muted)]">
-        Rilis data: {release.manifest?.dataset_version || "belum tersedia"}
+      <p className="mt-5 mb-0 text-sm leading-6 text-[var(--muted)] flex justify-between">
+        <span>Rilis data: {release.manifest?.dataset_version || "belum tersedia"}</span>
+        {selected.last_updated && <span>Diperbarui: {selected.last_updated}</span>}
       </p>
     </div>
   );
@@ -245,6 +308,16 @@ export function SearchPage({
   isDetailOpen,
   onCloseDetail,
 }) {
+  const [activeLayers, setActiveLayers] = useState(["affordability", "krl-network", "ai-highlight"]);
+
+  const handleToggleLayer = (layerId) => {
+    setActiveLayers((current) =>
+      current.includes(layerId)
+        ? current.filter((id) => id !== layerId)
+        : [...current, layerId]
+    );
+  };
+
   return (
     <main
       className={`theme-${isDark ? "dark" : "light"} min-h-screen bg-[var(--page-bg)] text-[var(--text)]`}
@@ -276,7 +349,7 @@ export function SearchPage({
           aria-label="Peta kawasan Lin Bogor"
         >
           <MapCanvas
-            activeLayers={SEARCH_LAYERS}
+            activeLayers={activeLayers}
             recommendationIds={recommendationIds}
             release={release.status === "ready" ? release : null}
             selectedStationId={selectedStationId}
@@ -284,7 +357,17 @@ export function SearchPage({
             onSelect={onSelect}
           />
           <MapStatus message={mapStatus} />
-          <p className="absolute right-3.5 bottom-3.5 z-2 m-0 rounded bg-[var(--surface-raised)]/90 px-2 py-1.5 text-[11px] text-[var(--muted)]">
+          
+          {/* Legend and Layer Panel overlays */}
+          <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4 pointer-events-none [&>*]:pointer-events-auto">
+            <LayerPanel activeLayers={activeLayers} onToggleLayer={handleToggleLayer} />
+          </div>
+          
+          <div className="absolute bottom-10 right-4 z-10 pointer-events-none [&>*]:pointer-events-auto">
+            <MapLegend activeLayers={activeLayers} />
+          </div>
+
+          <p className="absolute right-3.5 bottom-1.5 z-2 m-0 rounded bg-[var(--surface-raised)]/90 px-2 py-1 text-[10px] text-[var(--muted)] pointer-events-none">
             Peta kawasan Lin Bogor
           </p>
         </section>
@@ -296,7 +379,7 @@ export function SearchPage({
         title={null}
         onClose={onCloseDetail}
       >
-        <AreaDetail release={release} selected={selected} />
+        <AreaDetail release={release} selected={selected} results={results} />
       </Drawer>
     </main>
   );

@@ -1,10 +1,10 @@
 {
   "type": "FeatureCollection",
   "features": [
-    { "type": "Feature", "properties": { "station_id": "JKT", "station_name": "Jakarta Kota", "housing_price": 2250000 }, "geometry": { "type": "Point", "coordinates": [106.816,-6.149] } },
-    { "type": "Feature", "properties": { "station_id": "MGR", "station_name": "Manggarai", "housing_price": 1900000 }, "geometry": { "type": "Point", "coordinates": [106.851,-6.214] } },
-    { "type": "Feature", "properties": { "station_id": "TBT", "station_name": "Tebet", "housing_price": 1600000 }, "geometry": { "type": "Point", "coordinates": [106.855,-6.231] } },
-    { "type": "Feature", "properties": { "station_id": "PDC", "station_name": "Pondok Cina", "housing_price": 1350000 }, "geometry": { "type": "Point", "coordinates": [106.828,-6.360] } },
-    { "type": "Feature", "properties": { "station_id": "BGR", "station_name": "Bogor", "housing_price": 900000 }, "geometry": { "type": "Point", "coordinates": [106.794,-6.594] } }
+    { "type": "Feature", "properties": { "station_id": "JKT", "station_name": "Jakarta Kota", "housing_price": 2250000, "station_premium_rate": 22000, "line_name": "Lin Bogor", "headway_minutes": 10, "first_train": "04:30", "last_train": "23:00", "transfers": 0, "platform_count": 4 }, "geometry": { "type": "Point", "coordinates": [106.816,-6.149] } },
+    { "type": "Feature", "properties": { "station_id": "MGR", "station_name": "Manggarai", "housing_price": 1900000, "station_premium_rate": 18500, "line_name": "Lin Bogor", "headway_minutes": 8, "first_train": "04:15", "last_train": "23:30", "transfers": 2, "platform_count": 6 }, "geometry": { "type": "Point", "coordinates": [106.851,-6.214] } },
+    { "type": "Feature", "properties": { "station_id": "TBT", "station_name": "Tebet", "housing_price": 1600000, "station_premium_rate": 16000, "line_name": "Lin Bogor", "headway_minutes": 10, "first_train": "04:20", "last_train": "23:15", "transfers": 0, "platform_count": 2 }, "geometry": { "type": "Point", "coordinates": [106.855,-6.231] } },
+    { "type": "Feature", "properties": { "station_id": "PDC", "station_name": "Pondok Cina", "housing_price": 1350000, "station_premium_rate": 12000, "line_name": "Lin Bogor", "headway_minutes": 12, "first_train": "04:35", "last_train": "22:45", "transfers": 1, "platform_count": 2 }, "geometry": { "type": "Point", "coordinates": [106.828,-6.360] } },
+    { "type": "Feature", "properties": { "station_id": "BGR", "station_name": "Bogor", "housing_price": 900000, "station_premium_rate": 8500, "line_name": "Lin Bogor", "headway_minutes": 15, "first_train": "04:00", "last_train": "22:30", "transfers": 0, "platform_count": 4 }, "geometry": { "type": "Point", "coordinates": [106.794,-6.594] } }
   ]
 }
