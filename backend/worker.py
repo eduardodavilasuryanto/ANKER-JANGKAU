@@ -1,5 +1,6 @@
 """Cloudflare Workers entrypoint for the FastAPI application."""
 
+# pyrefly: ignore [missing-import]
 from workers import asgi
 
 from app.main import app

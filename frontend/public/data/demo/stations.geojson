@@ -1,10 +1,365 @@
 {
   "type": "FeatureCollection",
   "features": [
-    { "type": "Feature", "properties": { "station_id": "JKT", "station_name": "Jakarta Kota", "housing_price": 2250000, "station_premium_rate": 22000, "line_name": "Lin Bogor", "headway_minutes": 10, "first_train": "04:30", "last_train": "23:00", "transfers": 0, "platform_count": 4 }, "geometry": { "type": "Point", "coordinates": [106.816,-6.149] } },
-    { "type": "Feature", "properties": { "station_id": "MGR", "station_name": "Manggarai", "housing_price": 1900000, "station_premium_rate": 18500, "line_name": "Lin Bogor", "headway_minutes": 8, "first_train": "04:15", "last_train": "23:30", "transfers": 2, "platform_count": 6 }, "geometry": { "type": "Point", "coordinates": [106.851,-6.214] } },
-    { "type": "Feature", "properties": { "station_id": "TBT", "station_name": "Tebet", "housing_price": 1600000, "station_premium_rate": 16000, "line_name": "Lin Bogor", "headway_minutes": 10, "first_train": "04:20", "last_train": "23:15", "transfers": 0, "platform_count": 2 }, "geometry": { "type": "Point", "coordinates": [106.855,-6.231] } },
-    { "type": "Feature", "properties": { "station_id": "PDC", "station_name": "Pondok Cina", "housing_price": 1350000, "station_premium_rate": 12000, "line_name": "Lin Bogor", "headway_minutes": 12, "first_train": "04:35", "last_train": "22:45", "transfers": 1, "platform_count": 2 }, "geometry": { "type": "Point", "coordinates": [106.828,-6.360] } },
-    { "type": "Feature", "properties": { "station_id": "BGR", "station_name": "Bogor", "housing_price": 900000, "station_premium_rate": 8500, "line_name": "Lin Bogor", "headway_minutes": 15, "first_train": "04:00", "last_train": "22:30", "transfers": 0, "platform_count": 4 }, "geometry": { "type": "Point", "coordinates": [106.794,-6.594] } }
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "JAKARTA_KOTA",
+        "station_name": "Jakarta Kota",
+        "housing_price": 1632047
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.81462,
+          -6.137583
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "JAYAKARTA",
+        "station_name": "Jayakarta",
+        "housing_price": 1823025
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.823132,
+          -6.1413
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "MANGGA_BESAR",
+        "station_name": "Mangga Besar",
+        "housing_price": 2013333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.826983,
+          -6.149804
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "SAWAH_BESAR",
+        "station_name": "Sawah Besar",
+        "housing_price": 2047187
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.827655,
+          -6.160667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "JUANDA",
+        "station_name": "Juanda",
+        "housing_price": 1943070
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.830461,
+          -6.166675
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "GONDANGDIA",
+        "station_name": "Gondangdia",
+        "housing_price": 1927358
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.832566,
+          -6.185911
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "CIKINI",
+        "station_name": "Cikini",
+        "housing_price": 2065087
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.84128,
+          -6.198505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "MANGGARAI",
+        "station_name": "Manggarai",
+        "housing_price": 1837354
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.849935,
+          -6.21017
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "TEBET",
+        "station_name": "Tebet",
+        "housing_price": 1936547
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.858439,
+          -6.226398
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "CAWANG",
+        "station_name": "Cawang",
+        "housing_price": 1873349
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.85869,
+          -6.242552
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "DUREN_KALIBATA",
+        "station_name": "Duren Kalibata",
+        "housing_price": 1574226
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.855167,
+          -6.255201
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "PASAR_MINGGU_BARU",
+        "station_name": "Pasar Minggu Baru",
+        "housing_price": 1517735
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.851796,
+          -6.262798
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "PASAR_MINGGU",
+        "station_name": "Pasar Minggu",
+        "housing_price": 1572302
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.844856,
+          -6.283332
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "TANJUNG_BARAT",
+        "station_name": "Tanjung Barat",
+        "housing_price": 1527035
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.838949,
+          -6.308041
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "LENTENG_AGUNG",
+        "station_name": "Lenteng Agung",
+        "housing_price": 1250907
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.834679,
+          -6.330308
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "UNIVERSITAS_PANCASILA",
+        "station_name": "Universitas Pancasila",
+        "housing_price": 1238838
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.834263,
+          -6.339345
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "UNIVERSITAS_INDONESIA",
+        "station_name": "Universitas Indonesia",
+        "housing_price": 1143617
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.831782,
+          -6.360431
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "PONDOK_CINA",
+        "station_name": "Pondok Cina",
+        "housing_price": 1255246
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.832084,
+          -6.369059
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "DEPOK_BARU",
+        "station_name": "Depok Baru",
+        "housing_price": 1299515
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.821641,
+          -6.391129
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "DEPOK",
+        "station_name": "Depok",
+        "housing_price": 979787
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.817084,
+          -6.404826
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "CITAYAM",
+        "station_name": "Citayam",
+        "housing_price": 1056471
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.802362,
+          -6.448824
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "BOJONGGEDE",
+        "station_name": "Bojonggede",
+        "housing_price": 1027500
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.795025,
+          -6.493234
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "CILEBUT",
+        "station_name": "Cilebut",
+        "housing_price": 946154
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.800688,
+          -6.530724
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "station_id": "BOGOR",
+        "station_name": "Bogor",
+        "housing_price": 1109287
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.790769,
+          -6.594289
+        ]
+      }
+    }
   ]
 }

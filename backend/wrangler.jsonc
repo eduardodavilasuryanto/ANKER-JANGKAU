@@ -1,9 +1,11 @@
 {
   "$schema": "https://unpkg.com/wrangler@latest/config-schema.json",
   "name": "jangkau-api",
-  "main": "app/worker.py",
+  "main": "worker.py",
   "compatibility_date": "2026-09-09",
-  "compatibility_flags": ["python_workers"],
+  "compatibility_flags": [
+    "python_workers"
+  ],
   "observability": {
     "enabled": true
   },
@@ -11,7 +13,7 @@
     {
       "binding": "AUTH_DB",
       "database_name": "jangkau-auth",
-      "database_id": "REPLACE_WITH_D1_DATABASE_ID",
+      "database_id": "ecb3713a-8b6f-43f5-9e36-40ed2d7424b9",
       "migrations_dir": "migrations"
     }
   ]
