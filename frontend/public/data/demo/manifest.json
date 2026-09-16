@@ -1,7 +1,7 @@
 {
   "dataset_version": "prototype-demo-2026-09-06",
   "schema_version": "1.0.0",
-  "is_demo": true,
+  "is_demo": false,
   "score_legend": {
     "breaks": [0, 20, 40, 60, 80, 100],
     "labels": ["Sangat Rendah", "Rendah", "Sedang", "Tinggi", "Sangat Tinggi"],

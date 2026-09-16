@@ -2,8 +2,8 @@
 
 import json
 import uuid
-from datetime import UTC, datetime, timedelta
-from typing import Any
+from datetime import datetime, timedelta, timezone
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 
@@ -37,7 +37,7 @@ def _user_response(row: dict[str, Any]) -> UserResponse:
 
 
 async def _current_user(
-    authorization: str | None = Header(default=None),
+    authorization: Optional[str] = Header(default=None),
     database: Any = Depends(get_auth_database),
 ) -> dict[str, Any]:
     if not authorization or not authorization.startswith("Bearer "):
@@ -56,7 +56,7 @@ async def _current_user(
         WHERE sessions.token_hash = ? AND sessions.expires_at > ?
         """,
         hash_session_token(token),
-        datetime.now(UTC).isoformat(),
+        datetime.now(timezone.utc).isoformat(),
     ).first()
 
     if row is None:
@@ -70,7 +70,7 @@ async def _current_user(
 
 async def _create_session(database: Any, user: dict[str, Any]) -> SessionResponse:
     token = create_session_token()
-    expires_at = datetime.now(UTC) + SESSION_DURATION
+    expires_at = datetime.now(timezone.utc) + SESSION_DURATION
 
     await prepared_statement(
         database,
@@ -103,7 +103,7 @@ async def sign_up(
         "name": payload.name.strip(),
         "email": email,
         "password_hash": hash_password(payload.password),
-        "created_at": datetime.now(UTC).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
     }
     await prepared_statement(
         database,
@@ -141,7 +141,7 @@ async def login(
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(
-    authorization: str | None = Header(default=None), database: Any = Depends(get_auth_database)
+    authorization: Optional[str] = Header(default=None), database: Any = Depends(get_auth_database)
 ) -> None:
     if authorization and authorization.startswith("Bearer "):
         await prepared_statement(
@@ -200,8 +200,8 @@ async def create_saved_search(
         "label": payload.label.strip(),
         "search_input": json.dumps(payload.search_input),
         "search_result": json.dumps(payload.search_result),
-        "created_at": datetime.now(UTC).isoformat(),
-        "updated_at": datetime.now(UTC).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
     }
     await prepared_statement(
         database,

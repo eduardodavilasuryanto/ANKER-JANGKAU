@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field
@@ -19,7 +20,7 @@ class UserResponse(BaseModel):
     id: str
     name: str
     email: EmailStr
-    created_at: datetime | None = None
+    created_at: Optional[datetime] = None
 
 
 class SessionResponse(BaseModel):
