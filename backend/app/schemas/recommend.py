@@ -15,7 +15,9 @@ class RecommendationCard(BaseModel):
     avg_rent: float
     total_commute_time: float
     flood_risk_score: float
+    flood_risk_label: str
     data_source: str
+    kost_count: int = 0
     explanation: str
 
 

@@ -211,6 +211,12 @@ export default function App() {
       onSave={saveCurrentSearch}
       onSelect={selectArea}
       onSubmit={submitRecommendation}
+      onReset={() => {
+        setResults([]);
+        setRecommendationIds([]);
+        setApiStatus("idle");
+        setLastSearch(null);
+      }}
       onToggleTheme={toggleTheme}
     />
   ) : (

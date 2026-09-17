@@ -12,7 +12,7 @@ body {
 }
 
 :root,
-.theme-light {
+[data-theme="light"] {
   --page-bg: #f3f5f3;
   --surface: #ffffff;
   --surface-raised: #ffffff;
@@ -21,7 +21,7 @@ body {
   --border: rgba(23, 32, 25, 0.14);
 }
 
-.theme-dark {
+[data-theme="dark"] {
   --page-bg: #101713;
   --surface: #172019;
   --surface-raised: #202b23;
@@ -217,3 +217,17 @@ body {
 .catchment-hover { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
 .catchment-hover strong { font-weight: 600; }
 .catchment-hover span { color: #a3a3a3; font-size: 11px; }
+
+/* ─── Ant Design Drawer dark-mode override ─── */
+[data-theme="dark"] .ant-drawer-content {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+[data-theme="dark"] .ant-drawer-header {
+  background: var(--surface) !important;
+  border-bottom-color: var(--border) !important;
+}
+[data-theme="dark"] .ant-drawer-close {
+  color: var(--muted) !important;
+}
+

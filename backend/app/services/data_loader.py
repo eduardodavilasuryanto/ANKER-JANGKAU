@@ -1,9 +1,7 @@
-import json
-from pathlib import Path
+"""Load catchment data from the bundled constant (Workers-safe)."""
 
-# Resolve path to the demo geojson based on the monorepo structure
-BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
-GEOJSON_PATH = BASE_DIR / "frontend" / "public" / "data" / "demo" / "catchments.geojson"
+from app.services.catchments_data import CATCHMENTS
+
 
 class DataLoader:
     _catchments = None
@@ -11,11 +9,5 @@ class DataLoader:
     @classmethod
     def get_catchments(cls):
         if cls._catchments is None:
-            try:
-                with open(GEOJSON_PATH, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                    cls._catchments = [feature["properties"] for feature in data.get("features", [])]
-            except Exception as e:
-                print(f"Error loading catchments from {GEOJSON_PATH}: {e}")
-                cls._catchments = []
+            cls._catchments = list(CATCHMENTS)
         return cls._catchments

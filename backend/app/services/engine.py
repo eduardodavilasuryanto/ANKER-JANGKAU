@@ -1,5 +1,6 @@
 from app.services.data_loader import DataLoader
 from app.schemas.recommend import RecommendRequest
+from app.services.transit_graph import calculate_commute_time
 
 def filter_and_sort(payload: RecommendRequest, catchments: list[dict]) -> list[dict]:
     filtered = []
@@ -8,10 +9,11 @@ def filter_and_sort(payload: RecommendRequest, catchments: list[dict]) -> list[d
         if rent > payload.max_budget or rent < payload.min_budget:
             continue
         
-        commute = c.get("total_commute_time", float("inf"))
+        commute = calculate_commute_time(c.get("station_name", ""), payload.work_station)
         if commute > payload.max_commute:
             continue
             
+        c["dynamic_commute_time"] = commute
         filtered.append(c)
         
     filtered.sort(key=lambda x: x.get("composite_score", 0), reverse=True)
@@ -21,7 +23,7 @@ def generate_explanation(c: dict, payload: RecommendRequest) -> str:
     score = c.get("composite_score", 0.0)
     name = c.get("station_name", "Unknown")
     rent = c.get("avg_rent", 0.0)
-    commute = c.get("total_commute_time", 0.0)
+    commute = c.get("dynamic_commute_time", 0.0)
     flood = c.get("flood_risk_label", "Unknown")
     
     pct_under = 0
@@ -53,10 +55,11 @@ def run_engine(payload: RecommendRequest) -> list[dict]:
             "station_name": c.get("station_name", ""),
             "composite_score": c.get("composite_score", 0.0),
             "avg_rent": c.get("avg_rent", 0.0),
-            "total_commute_time": c.get("total_commute_time", 0.0),
+            "total_commute_time": c.get("dynamic_commute_time", 0.0),
             "flood_risk_score": c.get("flood_risk_score", 0.0),
-            "flood_risk_label": c.get("flood_risk_label", ""),
+            "flood_risk_label": c.get("flood_risk_label", "").capitalize(),
             "data_source": c.get("data_source", "primary"),
+            "kost_count": c.get("kost_count", 0),
             "explanation": generate_explanation(c, payload)
         })
     return results

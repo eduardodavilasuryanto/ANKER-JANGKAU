@@ -9,6 +9,9 @@
   "observability": {
     "enabled": true
   },
+  "vars": {
+    "CORS_ORIGINS": "jangkau-webgis-len.pages.dev"
+  },
   "d1_databases": [
     {
       "binding": "AUTH_DB",

@@ -1,6 +1,6 @@
 import { SaveOutlined, SearchOutlined, DownOutlined, UpOutlined, InfoCircleOutlined, ThunderboltOutlined } from "@ant-design/icons";
-import { Button, Drawer, Form, InputNumber, Select, Slider } from "antd";
-import { useState } from "react";
+import { Button, Drawer, Form, InputNumber, Select, Slider, Pagination } from "antd";
+import { useEffect, useState } from "react";
 
 import { AppNavbar } from "../components/AppNavbar.jsx";
 import { MapCanvas } from "../components/map/MapCanvas.jsx";
@@ -10,7 +10,8 @@ import { formatMinutes, formatRupiah, formatScore } from "../utils/format.js";
 
 const formLabelClass = "!pb-1.5 !text-[13px] !font-medium";
 
-function RecommendationForm({ apiStatus, stations, onSubmit }) {
+function RecommendationForm({ apiStatus, stations, onSubmit, onReset }) {
+  const [form] = Form.useForm();
   return (
     <section className="border-b border-[var(--border)] pb-7">
       <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
@@ -23,6 +24,7 @@ function RecommendationForm({ apiStatus, stations, onSubmit }) {
         Kami bandingkan sewa, biaya hidup, waktu perjalanan, dan risiko banjir.
       </p>
       <Form
+        form={form}
         className="grid gap-3.5"
         initialValues={{ budget: [1000000, 3000000], max_commute: 35 }}
         layout="vertical"
@@ -81,17 +83,28 @@ function RecommendationForm({ apiStatus, stations, onSubmit }) {
           />
         </Form.Item>
         <Form.Item className="!m-0">
-          <Button
-            block
-            className="!h-[42px] !rounded-lg !border-[#0c8c5e] !bg-[#0c8c5e] !text-white !shadow-none hover:!border-[#087a51] hover:!bg-[#087a51]"
-            disabled={stations.length === 0}
-            htmlType="submit"
-            icon={<SearchOutlined />}
-            loading={apiStatus === "loading"}
-            type="primary"
-          >
-            Cari kawasan
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              className="!h-[42px] !rounded-lg"
+              onClick={() => {
+                form.resetFields();
+                if (onReset) onReset();
+              }}
+            >
+              Reset
+            </Button>
+            <Button
+              block
+              className="!h-[42px] !rounded-lg !border-[#0c8c5e] !bg-[#0c8c5e] !text-white !shadow-none hover:!border-[#087a51] hover:!bg-[#087a51]"
+              disabled={stations.length === 0}
+              htmlType="submit"
+              icon={<SearchOutlined />}
+              loading={apiStatus === "loading"}
+              type="primary"
+            >
+              Cari kawasan
+            </Button>
+          </div>
         </Form.Item>
       </Form>
     </section>
@@ -99,7 +112,14 @@ function RecommendationForm({ apiStatus, stations, onSubmit }) {
 }
 
 function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
-  if (["idle", "empty", "error"].includes(apiStatus)) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 5;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [results]);
+
+  if (["idle", "empty", "error", "loading"].includes(apiStatus)) {
     const content = {
       idle: [
         "Kawasan yang cocok akan muncul di sini.",
@@ -112,6 +132,10 @@ function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
       error: [
         "Pencarian belum tersedia.",
         "Periksa layanan rekomendasi atau rilis data lalu coba lagi.",
+      ],
+      loading: [
+        "Sedang mencari kawasan...",
+        "Tunggu sebentar ya.",
       ],
     }[apiStatus];
     return (
@@ -129,6 +153,9 @@ function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
     );
   }
 
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedResults = results.slice(startIndex, startIndex + pageSize);
+
   return (
     <section className="pt-7" aria-live="polite">
       <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
@@ -137,23 +164,37 @@ function ResultsPanel({ apiStatus, onSave, onSelect, results, saveStatus }) {
       <h2 className="m-0 text-xl leading-[1.1] font-medium tracking-[-0.04em]">
         {results.length} kawasan untuk dipertimbangkan
       </h2>
-      <span className="mt-2.5 block text-xs text-[var(--muted)]">
-        Urut berdasarkan skor keterjangkauan
-      </span>
+      <div className="flex items-center justify-between mt-2.5">
+        <span className="block text-xs text-[var(--muted)]">
+          Urut berdasarkan skor keterjangkauan
+        </span>
+        <Button
+          className="!h-8 !rounded-lg !border-[var(--border)] !bg-[var(--surface-raised)] !text-[var(--text)] !shadow-none"
+          icon={<SaveOutlined />}
+          loading={saveStatus === "saving"}
+          onClick={onSave}
+          size="small"
+        >
+          {saveStatus === "saved" ? "Tersimpan" : "Simpan"}
+        </Button>
+      </div>
       <div className="mt-[18px] grid gap-2">
-        {results.map((result, index) => (
-          <ResultCard key={result.station_id} result={result} index={index} onSelect={onSelect} />
+        {paginatedResults.map((result, index) => (
+          <ResultCard key={result.station_id} result={result} index={startIndex + index} onSelect={onSelect} />
         ))}
       </div>
-      <Button
-        block
-        className="!mt-5 !h-10 !rounded-lg !border-[var(--border)] !bg-[var(--surface-raised)] !text-[var(--text)] !shadow-none"
-        icon={<SaveOutlined />}
-        loading={saveStatus === "saving"}
-        onClick={onSave}
-      >
-        {saveStatus === "saved" ? "Pencarian tersimpan" : "Simpan pencarian"}
-      </Button>
+      {results.length > pageSize && (
+        <div className="mt-5 flex justify-center">
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={results.length}
+            onChange={setCurrentPage}
+            size="small"
+            showSizeChanger={false}
+          />
+        </div>
+      )}
     </section>
   );
 }
@@ -215,59 +256,59 @@ function ResultCard({ result, index, onSelect }) {
 
 function AreaDetail({ release, selected, results }) {
   if (!selected) return null;
+  
+  const capitalize = (s) => s ? s.charAt(0).toUpperCase() + s.slice(1) : "Belum tersedia";
+  
   const metrics = [
     ["Sewa rata-rata", formatRupiah(selected.avg_rent)],
-    ["Biaya makan per porsi", formatRupiah(selected.avg_food_price)],
     ["Biaya hidup harian", formatRupiah(selected.avg_daily_spend)],
     ["Waktu ke kerja", formatMinutes(selected.total_commute_time)],
-    ["Area jangkauan", selected.isochrone_min ? `${selected.isochrone_min} menit` : "Belum tersedia"],
-    ["Risiko banjir", selected.flood_risk_label || "Belum tersedia"],
-    ["Premi stasiun", formatRupiah(selected.station_premium_rate)],
-    ["Kluster AI", selected.hotspot_cluster || "Belum tersedia"],
+    ["Risiko banjir", capitalize(selected.flood_risk_label)],
+    ["Jumlah kos", selected.kost_count != null ? `${selected.kost_count} unit` : "Belum tersedia"],
   ];
   
   const resultMatch = results?.find(r => r.station_id === selected.station_id);
 
   return (
-    <div className="p-2 text-[var(--text)]">
+    <div className="p-2" style={{ color: "var(--text)" }}>
       <p className="mb-3 text-xs font-semibold tracking-[0.1em] text-[#0c8c5e]">
         KAWASAN TERPILIH
       </p>
       <div className="flex items-baseline justify-between gap-4">
-        <h2 className="m-0 text-[32px] leading-[1.1] font-medium tracking-[-0.045em]">
+        <h2 className="m-0 text-[32px] leading-[1.1] font-medium tracking-[-0.045em]" style={{ color: "var(--text)" }}>
           {selected.station_name}
         </h2>
-        <strong className="whitespace-nowrap text-lg">
+        <strong className="whitespace-nowrap text-lg" style={{ color: "var(--text)" }}>
           {formatScore(selected.composite_score)}/100
         </strong>
       </div>
-      <p className="mt-4 mb-6 text-sm leading-6 text-[var(--muted)]">
+      <p className="mt-4 mb-6 text-sm leading-6" style={{ color: "var(--muted)" }}>
         {selected.data_source === "interpolated"
           ? "Nilai ini merupakan estimasi interpolasi spasial."
           : "Nilai ini berasal dari data yang tersedia pada rilis saat ini."}
       </p>
       
       {resultMatch?.explanation && (
-        <div className="mb-6 bg-[#f0f9f5] dark:bg-[#0a2e1f] border border-[#a7e4c7] rounded-lg p-3.5">
+        <div className="mb-6 rounded-lg p-3.5" style={{ background: "var(--surface-raised)", border: "1px solid var(--border)" }}>
           <div className="flex items-center gap-2 mb-2 text-[#0c8c5e]">
             <ThunderboltOutlined />
             <span className="text-xs font-semibold tracking-[0.05em]">ANALISIS AI</span>
           </div>
-          <p className="m-0 text-[13px] leading-relaxed text-[var(--text)]">
+          <p className="m-0 text-[13px] leading-relaxed" style={{ color: "var(--text)" }}>
             {resultMatch.explanation}
           </p>
         </div>
       )}
 
-      <dl className="m-0 grid grid-cols-2 gap-px border border-[var(--border)] bg-[var(--border)] max-[480px]:grid-cols-1">
+      <dl className="m-0 grid grid-cols-2 gap-px max-[480px]:grid-cols-1 rounded-lg overflow-hidden" style={{ border: "1px solid var(--border)", background: "var(--border)" }}>
         {metrics.map(([label, value]) => (
-          <div className="bg-[var(--surface)] p-3.5" key={label}>
-            <dt className="text-xs text-[var(--muted)]">{label}</dt>
-            <dd className="mt-1.5 text-sm font-medium">{value}</dd>
+          <div className="p-3.5" key={label} style={{ background: "var(--surface-raised)" }}>
+            <dt className="text-xs" style={{ color: "var(--muted)" }}>{label}</dt>
+            <dd className="mt-1.5 text-sm font-medium" style={{ color: "var(--text)" }}>{value}</dd>
           </div>
         ))}
       </dl>
-      <p className="mt-5 mb-0 text-sm leading-6 text-[var(--muted)] flex justify-between">
+      <p className="mt-5 mb-0 text-sm leading-6 flex justify-between" style={{ color: "var(--muted)" }}>
         <span>Rilis data: {release.manifest?.dataset_version || "belum tersedia"}</span>
         {selected.last_updated && <span>Diperbarui: {selected.last_updated}</span>}
       </p>
@@ -296,6 +337,7 @@ export function SearchPage({
   onSave,
   onSelect,
   onSubmit,
+  onReset,
   onToggleTheme,
   recommendationIds,
   release,
@@ -335,6 +377,7 @@ export function SearchPage({
             apiStatus={apiStatus}
             stations={stations}
             onSubmit={onSubmit}
+            onReset={onReset}
           />
           <ResultsPanel
             apiStatus={apiStatus}
