@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 
 import { MAP_DEFAULTS } from "../../config/map.js";
+import { buildStationPopupHTML } from "../ui/StationPopup.js";
 
 const LAYER_IDS = [
   "affordability",
@@ -40,6 +41,8 @@ export function MapCanvas({
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
+  const popupRef = useRef(null);
+  const hoverPopupRef = useRef(null);
   const [mapReady, setMapReady] = useState(false);
   const [mapUnavailable, setMapUnavailable] = useState(false);
 
@@ -84,6 +87,8 @@ export function MapCanvas({
 
     return () => {
       cancelAnimationFrame(animationFrame);
+      popupRef.current?.remove();
+      hoverPopupRef.current?.remove();
       map?.remove();
       mapRef.current = null;
     };
@@ -241,16 +246,73 @@ export function MapCanvas({
           "circle-stroke-width": 2,
         },
       });
+
+      // Station marker click → popup
+      map.on("click", "station-markers", (event) => {
+        const feature = event.features?.[0];
+        if (!feature) return;
+
+        const properties = feature.properties;
+        // Parse any stringified JSON properties
+        const parsed = {};
+        for (const [key, value] of Object.entries(properties)) {
+          try {
+            parsed[key] = JSON.parse(value);
+          } catch {
+            parsed[key] = value;
+          }
+        }
+
+        popupRef.current?.remove();
+        popupRef.current = new maplibregl.Popup({
+          offset: 12,
+          closeButton: true,
+          maxWidth: "280px",
+          className: "station-popup-container",
+        })
+          .setLngLat(feature.geometry.coordinates)
+          .setHTML(buildStationPopupHTML(parsed))
+          .addTo(map);
+      });
     }
 
+    // Catchment area click → select
     map.on("click", "affordability", (event) =>
       onSelect(event.features?.[0]?.properties?.station_id),
     );
-    map.on("mouseenter", "affordability", () => {
+
+    // Catchment hover tooltip
+    map.on("mouseenter", "affordability", (event) => {
       map.getCanvas().style.cursor = "pointer";
+      const feature = event.features?.[0];
+      if (!feature) return;
+
+      const props = feature.properties;
+      const score = Number(props.composite_score);
+      const name = props.station_name || "—";
+
+      hoverPopupRef.current?.remove();
+      hoverPopupRef.current = new maplibregl.Popup({
+        offset: 10,
+        closeButton: false,
+        closeOnClick: false,
+        className: "catchment-hover-popup",
+      })
+        .setLngLat(event.lngLat)
+        .setHTML(
+          `<div class="catchment-hover"><strong>${name}</strong><span>Skor: ${Number.isFinite(score) ? score.toFixed(1) : "—"}</span></div>`,
+        )
+        .addTo(map);
+    });
+    map.on("mousemove", "affordability", (event) => {
+      if (hoverPopupRef.current) {
+        hoverPopupRef.current.setLngLat(event.lngLat);
+      }
     });
     map.on("mouseleave", "affordability", () => {
       map.getCanvas().style.cursor = "";
+      hoverPopupRef.current?.remove();
+      hoverPopupRef.current = null;
     });
   }, [mapReady, onSelect, release]);
 
@@ -316,7 +378,7 @@ export function MapCanvas({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full inset-0"
+      className="absolute inset-0 w-full h-full"
       role="application"
       aria-label="Peta kawasan stasiun Lin Bogor"
     />

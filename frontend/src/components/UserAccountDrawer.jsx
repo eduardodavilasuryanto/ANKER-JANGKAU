@@ -1,6 +1,7 @@
 import { DeleteOutlined, LoginOutlined } from "@ant-design/icons";
 import { Button, Drawer, Form, Input } from "antd";
 import { useState } from "react";
+import { isInDemoAuthMode } from "../services/api.js";
 
 export function UserAccountDrawer({
   onClose,
@@ -13,13 +14,27 @@ export function UserAccountDrawer({
   session,
 }) {
   const [mode, setMode] = useState("login");
+  const [loading, setLoading] = useState(false);
+  const isDemo = isInDemoAuthMode();
+  
+  const handleFinish = async (values) => {
+    setLoading(true);
+    try {
+      await onSubmit(mode, values);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (session) {
     return (
       <Drawer title="Akun saya" open={open} onClose={onClose} size="default">
         <div className="grid gap-6">
           <div>
-            <p className="m-0 text-base font-medium">{session.user.name}</p>
+            <p className="m-0 text-base font-medium flex items-center gap-2">
+              {session.user.name}
+              {isDemo && <span className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-200 font-normal">Demo</span>}
+            </p>
             <p className="mt-1 mb-0 text-sm text-[var(--muted)]">
               {session.user.email}
             </p>
@@ -70,7 +85,12 @@ export function UserAccountDrawer({
   const isSignUp = mode === "sign-up";
   return (
     <Drawer
-      title={isSignUp ? "Buat akun" : "Masuk"}
+      title={
+        <div className="flex items-center gap-2">
+          {isSignUp ? "Buat akun" : "Masuk"}
+          {isDemo && <span className="text-[10px] bg-amber-50 text-amber-600 px-1.5 py-0.5 rounded border border-amber-200 font-normal">Demo</span>}
+        </div>
+      }
       open={open}
       onClose={onClose}
       size="default"
@@ -81,7 +101,7 @@ export function UserAccountDrawer({
       <Form
         className="grid gap-1"
         layout="vertical"
-        onFinish={(values) => onSubmit(mode, values)}
+        onFinish={handleFinish}
       >
         {isSignUp ? (
           <Form.Item
@@ -116,13 +136,14 @@ export function UserAccountDrawer({
             autoComplete={isSignUp ? "new-password" : "current-password"}
           />
         </Form.Item>
-        <Button className="!mt-2 !h-10" htmlType="submit" type="primary">
+        <Button className="!mt-2 !h-10" htmlType="submit" type="primary" loading={loading}>
           {isSignUp ? "Buat akun" : "Masuk"}
         </Button>
       </Form>
       <Button
         className="!mt-4 !px-0"
         type="link"
+        disabled={loading}
         onClick={() => setMode(isSignUp ? "login" : "sign-up")}
       >
         {isSignUp ? "Sudah punya akun? Masuk" : "Belum punya akun? Buat akun"}

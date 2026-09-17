@@ -12,7 +12,7 @@ body {
 }
 
 :root,
-.theme-light {
+[data-theme="light"] {
   --page-bg: #f3f5f3;
   --surface: #ffffff;
   --surface-raised: #ffffff;
@@ -21,7 +21,7 @@ body {
   --border: rgba(23, 32, 25, 0.14);
 }
 
-.theme-dark {
+[data-theme="dark"] {
   --page-bg: #101713;
   --surface: #172019;
   --surface-raised: #202b23;
@@ -117,3 +117,117 @@ body {
     rgba(248, 252, 248, 0.08)
   );
 }
+
+/* Map Components */
+.layer-panel {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  width: 240px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.layer-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+}
+.layer-panel-title { flex: 1; text-align: left; }
+.layer-panel-chevron {
+  transition: transform 0.2s;
+}
+.layer-panel-chevron[data-collapsed="false"] { transform: rotate(-90deg); }
+.layer-panel-body {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 12px 12px;
+}
+.layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+.layer-toggle-icon { display: flex; align-items: center; font-size: 14px; }
+.layer-toggle-text { flex: 1; display: flex; flex-direction: column; }
+.layer-toggle-label { font-size: 13px; font-weight: 500; color: var(--text); }
+.layer-toggle-desc { font-size: 11px; color: var(--muted); }
+
+.map-legend {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+}
+.map-legend-section { display: flex; flex-direction: column; gap: 6px; }
+.map-legend-label { font-size: 12px; font-weight: 600; color: var(--text); }
+.map-legend-bar { display: flex; height: 12px; border-radius: 4px; overflow: hidden; }
+.map-legend-swatch { flex: 1; }
+.map-legend-ticks { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
+.map-legend-items { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text); }
+.map-legend-item { display: flex; align-items: center; gap: 8px; }
+.map-legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+.map-legend-gradient-bar { height: 12px; border-radius: 4px; margin-bottom: 4px; }
+
+.station-popup-container .maplibregl-popup-content {
+  padding: 14px;
+  border-radius: 8px;
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+.station-popup-container .maplibregl-popup-close-button {
+  color: var(--muted);
+  font-size: 18px;
+  padding: 4px 8px;
+}
+.station-popup-header { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; padding-right: 16px; }
+.station-popup-name { font-size: 15px; font-weight: 600; }
+.station-popup-line { font-size: 11px; color: #0c8c5e; font-weight: 500; }
+.station-popup-body { display: flex; flex-direction: column; gap: 6px; }
+.station-popup-row { display: flex; justify-content: space-between; gap: 16px; font-size: 12px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+.station-popup-row:last-child { border-bottom: none; padding-bottom: 0; }
+.station-popup-label { color: var(--muted); }
+.station-popup-value { font-weight: 500; }
+
+.catchment-hover-popup .maplibregl-popup-content {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #172019;
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+.catchment-hover-popup .maplibregl-popup-tip { border-top-color: #172019; border-bottom-color: #172019; }
+.catchment-hover { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.catchment-hover strong { font-weight: 600; }
+.catchment-hover span { color: #a3a3a3; font-size: 11px; }
+
+/* ─── Ant Design Drawer dark-mode override ─── */
+[data-theme="dark"] .ant-drawer-content {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+[data-theme="dark"] .ant-drawer-header {
+  background: var(--surface) !important;
+  border-bottom-color: var(--border) !important;
+}
+[data-theme="dark"] .ant-drawer-close {
+  color: var(--muted) !important;
+}
+

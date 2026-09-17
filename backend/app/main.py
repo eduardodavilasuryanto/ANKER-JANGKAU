@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,10 +12,19 @@ app = FastAPI(
     description="Jangkau kitchen: scored catchments in, ranked station cards out.",
 )
 
+# Build the CORS allow-list from the CORS_ORIGINS env var (comma-separated).
+# Always include localhost for local development.
+_default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+_extra = os.getenv("CORS_ORIGINS", "")
+_origins = _default_origins + [o.strip() for o in _extra.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

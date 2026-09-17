@@ -1,6 +1,12 @@
 {
   "dataset_version": "prototype-demo-2026-09-06",
-  "is_demo": true,
+  "schema_version": "1.0.0",
+  "is_demo": false,
+  "score_legend": {
+    "breaks": [0, 20, 40, 60, 80, 100],
+    "labels": ["Sangat Rendah", "Rendah", "Sedang", "Tinggi", "Sangat Tinggi"],
+    "colors": ["#d7f0e5", "#a9dec7", "#76c39d", "#3aa36f", "#0c8c5e"]
+  },
   "artifacts": {
     "catchments": "/data/demo/catchments.geojson",
     "stations": "/data/demo/stations.geojson",

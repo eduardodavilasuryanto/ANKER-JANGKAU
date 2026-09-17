@@ -4,10 +4,10 @@ function floodLabel(score) {
   return "rendah";
 }
 
-export function createDemoRecommendations({ budget, maxCommute }, catchments) {
+export function createDemoRecommendations({ min_budget, max_budget, maxCommute }, catchments) {
   return catchments.features
     .map((feature) => feature.properties)
-    .filter((properties) => properties.avg_rent <= budget)
+    .filter((properties) => properties.avg_rent >= min_budget && properties.avg_rent <= max_budget)
     .filter((properties) => properties.total_commute_time <= maxCommute)
     .sort((first, second) => second.composite_score - first.composite_score)
     .map((properties) => ({

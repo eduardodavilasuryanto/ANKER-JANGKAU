@@ -128,7 +128,7 @@ export default function App() {
     setSaveStatus("saving");
     try {
       await saveSearch(session.token, {
-        label: `${lastSearch.work_station} · ${formatRupiah(lastSearch.budget)}`,
+        label: `${lastSearch.work_station} · ${formatRupiah(lastSearch.min_budget)} - ${formatRupiah(lastSearch.max_budget)}`,
         search_input: lastSearch,
         search_result: { results },
       });
@@ -165,7 +165,8 @@ export default function App() {
     setIsDetailOpen(false);
     try {
       const payload = {
-        budget: Number(values.budget),
+        min_budget: Number(values.budget[0]),
+        max_budget: Number(values.budget[1]),
         work_station: String(values.work_station),
         max_commute: Number(values.max_commute),
       };
@@ -210,6 +211,12 @@ export default function App() {
       onSave={saveCurrentSearch}
       onSelect={selectArea}
       onSubmit={submitRecommendation}
+      onReset={() => {
+        setResults([]);
+        setRecommendationIds([]);
+        setApiStatus("idle");
+        setLastSearch(null);
+      }}
       onToggleTheme={toggleTheme}
     />
   ) : (

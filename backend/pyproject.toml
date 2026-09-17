@@ -10,7 +10,7 @@ dependencies = [
     "pydantic[email]>=2.9.0",
     "pydantic-settings>=2.5.0",
     "python-dotenv>=1.0.1",
-    "uvicorn[standard]>=0.32.0",
+    "uvicorn>=0.32.0",
 ]
 
 [dependency-groups]
